@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>质押复利计算器</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1f;
+            --card-bg: #26262d;
+            --text-main: #f0f0f0;
+            --text-muted: #8a8a93;
+            --accent-color: #d12c2c;
+            --input-bg: #32323c;
+            --border-line: #3c3c45;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        h2 {
+            text-align: center;
+            font-size: 18px;
+            margin: 5px 0 15px 0;
+            color: var(--text-main);
+        }
+        .section {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-line);
+            padding-bottom: 5px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 15px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .input-group label {
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: var(--text-muted);
+        }
+        .input-group input {
+            background-color: var(--input-bg);
+            border: 1px solid #454552;
+            color: var(--text-main);
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 14px;
+            outline: none;
+        }
+        .input-group input:focus {
+            border-color: var(--accent-color);
+        }
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .result-table th, .result-table td {
+            text-align: right;
+            padding: 8px 4px;
+            border-bottom: 1px solid var(--border-line);
+        }
+        .result-table th {
+            font-weight: normal;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        .result-table th:first-child, .result-table td:first-child {
+            text-align: left;
+        }
+        .result-table tr:last-child td {
+            border-bottom: none;
+        }
+        .time-input {
+            width: 35px;
+            background-color: var(--input-bg);
+            border: 1px solid #454552;
+            color: var(--text-main);
+            border-radius: 4px;
+            padding: 3px;
+            text-align: center;
+            font-size: 13px;
+            outline: none;
+        }
+        .highlight-money {
+            color: #4cd964;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .result-value {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>质押复利计算器</h2>
+    <div class="section">
+        <div class="section-title">核心参数</div>
+        <div class="grid-2">
+            <div class="input-group">
+                <label>初始币量 (留空不计算)</label>
+                <input type="number" id="initialAmount" placeholder="如: 1258" step="any">
+            </div>
+            <div class="input-group">
+                <label>当前币价 ($)</label>
+                <input type="number" id="coinPrice" placeholder="如: 6.084" step="any">
+            </div>
+            <div class="input-group">
+                <label>年化收益率 APY (%)</label>
+                <input type="number" id="apy" value="805.74" step="any">
+            </div>
+            <div class="input-group">
+                <label>日收益率 (%)</label>
+                <input type="number" id="dailyRate" value="0.6042" step="any">
+            </div>
+            <div class="input-group" style="grid-column: span 2;">
+                <label>美元兑换汇率</label>
+                <input type="number" id="exchangeRate" value="7" step="any">
+            </div>
+        </div>
+    </div>
+    <div class="section" style="flex-grow: 1;">
+        <div class="section-title">预估回报 (实时联动)</div>
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>预估时长</th>
+                    <th>最终币量</th>
+                    <th>总收益 (¥)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>7 天</td>
+                    <td class="result-value" id="day7Amount">--</td>
+                    <td class="highlight-money" id="day7Value">--</td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" id="customMonths" value="1" class="time-input" step="any"> 个月
+                    </td>
+                    <td class="result-value" id="monthAmount">--</td>
+                    <td class="highlight-money" id="monthValue">--</td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" id="customYears" value="1" class="time-input" step="any"> 年
+                    </td>
+                    <td class="result-value" id="yearAmount">--</td>
+                    <td class="highlight-money" id="yearValue">--</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        const inputAmount = document.getElementById('initialAmount');
+        const inputPrice = document.getElementById('coinPrice');
+        const inputExchange = document.getElementById('exchangeRate');
+        const inputApy = document.getElementById('apy');
+        const inputDaily = document.getElementById('dailyRate');
+        const inputMonths = document.getElementById('customMonths');
+        const inputYears = document.getElementById('customYears');
+        [inputAmount, inputPrice, inputExchange, inputMonths, inputYears].forEach(el => {
+            el.addEventListener('input', calculateResults);
+        });
+        inputApy.addEventListener('input', () => {
+            let apy = parseFloat(inputApy.value) / 100;
+            if (!isNaN(apy) && apy > -1) {
+                let rebaseRate = Math.pow(1 + apy, 1 / 1095) - 1;
+                inputDaily.value = (rebaseRate * 3 * 100).toFixed(4);
+            }
+            calculateResults();
+        });
+        inputDaily.addEventListener('input', () => {
+            let daily = parseFloat(inputDaily.value) / 100;
+            if (!isNaN(daily)) {
+                let rebaseRate = daily / 3;
+                let apy = Math.pow(1 + rebaseRate, 1095) - 1;
+                inputApy.value = (apy * 100).toFixed(2);
+            }
+            calculateResults();
+        });
+        function calculateResults() {
+            const amount = parseFloat(inputAmount.value);
+            const daily = parseFloat(inputDaily.value) / 100;
+            const price = parseFloat(inputPrice.value);
+            const rate = parseFloat(inputExchange.value);
+            const months = parseFloat(inputMonths.value);
+            const years = parseFloat(inputYears.value);
+            if (isNaN(amount) || isNaN(daily)) {
+                resetDisplays();
+                return;
+            }
+            const rebaseRate = daily / 3;
+            function updateRow(days, prefix) {
+                const totalRebases = days * 3;
+                const finalAmount = amount * Math.pow(1 + rebaseRate, totalRebases);
+                document.getElementById(`${prefix}Amount`).innerText = finalAmount.toFixed(4);
+                if (!isNaN(price) && !isNaN(rate)) {
+                    const totalRmb = finalAmount * price * rate;
+                    document.getElementById(`${prefix}Value`).innerText = `¥ ${totalRmb.toFixed(2)}`;
+                } else {
+                    document.getElementById(`${prefix}Value`).innerText = "等待币价";
+                }
+            }
+            updateRow(7, 'day7');
+            if(!isNaN(months)) updateRow(months * 30, 'month');
+            if(!isNaN(years)) updateRow(years * 365, 'year');
+        }
+        function resetDisplays() {
+            const prefixes = ['day7', 'month', 'year'];
+            prefixes.forEach(prefix => {
+                document.getElementById(`${prefix}Amount`).innerText = '--';
+                document.getElementById(`${prefix}Value`).innerText = '--';
+            });
+        }
+        calculateResults();
+    </script>
+</body>
+</html>
