@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -7,14 +8,14 @@
     <style>
         /* 终极暗黑高级配色与排版优化 */
         :root {
-            --bg-body: #0d0d12;       /* 更深邃的背景底色 */
-            --bg-card: linear-gradient(145deg, #1a1a24, #14141d); /* 卡片加入微弱光泽渐变 */
-            --bg-input: rgba(255, 255, 255, 0.03); /* 输入框半透明融合 */
+            --bg-body: #0d0d12;
+            --bg-card: linear-gradient(145deg, #1a1a24, #14141d);
+            --bg-input: rgba(255, 255, 255, 0.03);
             --border-input: rgba(255, 255, 255, 0.06); 
             --text-main: #ffffff;
             --text-muted: #8b8b9b;
-            --accent-red: #f03e4d;    /* 提亮红色，更有活力 */
-            --profit-green: #12d48a;  /* 调整为更护眼的加密货币绿 */
+            --accent-red: #f03e4d;
+            --profit-green: #12d48a;
         }
 
         * {
@@ -34,7 +35,6 @@
             flex-direction: column;
         }
 
-        /* 顶部标题加入渐变发光效果 */
         .header {
             text-align: center;
             padding: 5px 0 15px 0;
@@ -49,7 +49,6 @@
             letter-spacing: 1px;
         }
 
-        /* 卡片优化：增加内发光与高级阴影 */
         .card {
             background: var(--bg-card);
             border-radius: 20px;
@@ -74,10 +73,9 @@
             background-color: var(--accent-red);
             border-radius: 4px;
             margin-right: 10px;
-            box-shadow: 0 0 8px rgba(240, 62, 77, 0.5); /* 红色指示条发光 */
+            box-shadow: 0 0 8px rgba(240, 62, 77, 0.5);
         }
 
-        /* 网格布局 */
         .params-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -96,7 +94,6 @@
             font-weight: 500;
         }
 
-        /* 胶囊感的高级输入框 */
         input[type="number"] {
             background-color: var(--bg-input);
             border: 1px solid var(--border-input);
@@ -108,7 +105,7 @@
             outline: none;
             width: 100%;
             transition: all 0.3s ease;
-            font-family: inherit; /* 继承系统字体，数字更好看 */
+            font-family: inherit;
         }
 
         input[type="number"]::placeholder {
@@ -118,14 +115,13 @@
 
         input[type="number"]:focus {
             border-color: var(--accent-red);
-            background-color: rgba(240, 62, 77, 0.05); /* 聚焦时背景微红 */
+            background-color: rgba(240, 62, 77, 0.05);
         }
 
         .full-width {
             grid-column: span 2;
         }
 
-        /* 预估回报结果区优化 */
         .results-container {
             display: flex;
             flex-direction: column;
@@ -137,14 +133,13 @@
             justify-content: space-between;
             align-items: center;
             padding: 14px 0;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.06); /* 改为虚线，更轻盈 */
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
         }
         .result-row:last-child {
             border-bottom: none;
             padding-bottom: 0;
         }
 
-        /* 左侧时间标签：胶囊风格化 */
         .time-label {
             display: flex;
             align-items: center;
@@ -162,7 +157,6 @@
             border: 1px solid rgba(255,255,255,0.03);
         }
 
-        /* 微型输入框深度优化 */
         .inline-input {
             width: 32px !important;
             height: 24px;
@@ -174,7 +168,7 @@
             border-bottom: 1px solid var(--text-muted) !important;
             border-radius: 0 !important;
             margin-right: 4px;
-            color: var(--accent-red) !important; /* 强调可编辑的数字 */
+            color: var(--accent-red) !important;
             font-weight: bold !important;
         }
         .inline-input:focus {
@@ -182,21 +176,23 @@
             background-color: transparent !important;
         }
 
-        /* 结果数值对齐优化 */
         .result-data {
             text-align: right;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            font-variant-numeric: tabular-nums; /* 强制数字等宽，对齐更完美 */
+            align-items: flex-end; /* 保证靠右对齐 */
+            font-variant-numeric: tabular-nums;
         }
         
         .result-coin {
             font-size: 16px;
             font-weight: 700;
             color: var(--text-main);
-            margin-bottom: 4px;
+            margin-bottom: 5px;
             letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
         }
 
         .result-fiat {
@@ -204,18 +200,34 @@
             font-weight: 600;
             color: var(--profit-green);
             letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
         }
         
         .empty-dash {
             color: rgba(255,255,255,0.2);
             font-weight: normal;
         }
+
+        /* 智能中文单位徽章的样式 */
+        .unit-badge {
+            font-size: 11px;
+            font-weight: normal;
+            color: #a0a0b5;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 6px;
+            margin-left: 8px;
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>LGNS专用计算器</h1>
+        <h1>质押复利计算器</h1>
     </div>
 
     <div class="card">
@@ -227,12 +239,12 @@
             </div>
             <div class="input-group">
                 <label>当前币价 ($)</label>
-                <input type="number" id="coinPrice" placeholder="6.10" step="any">
+                <input type="number" id="coinPrice" placeholder="6.50" step="any">
             </div>
             
             <div class="input-group">
-                <label>年化率 (%)</label>
-                <input type="number" id="年化率" value="805.74" step="any">
+                <label>APY (%)</label>
+                <input type="number" id="apy" value="805.74" step="any">
             </div>
             <div class="input-group">
                 <label>日收益率 (%)</label>
@@ -292,44 +304,61 @@
         const inputAmount = document.getElementById('initialAmount');
         const inputPrice = document.getElementById('coinPrice');
         const inputExchange = document.getElementById('exchangeRate');
-        const input年化率 = document.getElementById('年化率');
+        const inputApy = document.getElementById('apy');
         const inputDaily = document.getElementById('dailyRate');
         const inputDays = document.getElementById('customDays');
         const inputMonths = document.getElementById('customMonths');
         const inputYears = document.getElementById('customYears');
 
-        // 通用触发计算
         [inputAmount, inputPrice, inputExchange, inputDays, inputMonths, inputYears].forEach(el => {
             el.addEventListener('input', calculateResults);
         });
 
-        // 年化率 -> 日收益率
-        input年化率.addEventListener('input', () => {
-            let 年化率 = parseFloat(input年化率.value) / 100;
-            if (!isNaN(年化率) && 年化率 > -1) {
-                let rebaseRate = Math.pow(1 + 年化率, 1 / 1095) - 1;
+        inputApy.addEventListener('input', () => {
+            let apy = parseFloat(inputApy.value) / 100;
+            if (!isNaN(apy) && apy > -1) {
+                let rebaseRate = Math.pow(1 + apy, 1 / 1095) - 1;
                 inputDaily.value = (rebaseRate * 3 * 100).toFixed(4);
             }
             calculateResults();
         });
 
-        // 日收益率 -> 年化率
         inputDaily.addEventListener('input', () => {
             let daily = parseFloat(inputDaily.value) / 100;
             if (!isNaN(daily)) {
                 let rebaseRate = daily / 3;
-                let 年化率 = Math.pow(1 + rebaseRate, 1095) - 1;
-                input年化率.value = (年化率 * 100).toFixed(2);
+                let apy = Math.pow(1 + rebaseRate, 1095) - 1;
+                inputApy.value = (apy * 100).toFixed(2);
             }
             calculateResults();
         });
 
+        // 修改为保留 1 位小数
         function formatNumber(num) {
-            return num.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+            return num.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
         }
 
         function formatMoney(num) {
-            return '¥ ' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return '¥ ' + num.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        }
+
+        // 智能获取中文单位徽章
+        function getUnitBadge(num) {
+            if (num < 1000) return ''; // 小于一千不显示单位
+            
+            let text = '';
+            if (num >= 100000000) {
+                text = (num / 100000000).toFixed(2) + ' 亿';
+            } else if (num >= 1000000) {
+                text = (num / 1000000).toFixed(2) + ' 百万';
+            } else if (num >= 100000) {
+                text = (num / 100000).toFixed(2) + ' 十万';
+            } else if (num >= 10000) {
+                text = (num / 10000).toFixed(2) + ' 万';
+            } else if (num >= 1000) {
+                text = (num / 1000).toFixed(2) + ' 千';
+            }
+            return `<span class="unit-badge">${text}</span>`;
         }
 
         function calculateResults() {
@@ -352,11 +381,12 @@
                 const totalRebases = daysCount * 3;
                 const finalAmount = amount * Math.pow(1 + rebaseRate, totalRebases);
                 
-                document.getElementById(`${prefix}Amount`).innerText = formatNumber(finalAmount);
+                // 拼接数字和智能单位
+                document.getElementById(`${prefix}Amount`).innerHTML = formatNumber(finalAmount) + getUnitBadge(finalAmount);
 
                 if (!isNaN(price) && !isNaN(rate)) {
                     const totalRmb = finalAmount * price * rate;
-                    document.getElementById(`${prefix}Value`).innerText = formatMoney(totalRmb);
+                    document.getElementById(`${prefix}Value`).innerHTML = formatMoney(totalRmb) + getUnitBadge(totalRmb);
                 } else {
                     document.getElementById(`${prefix}Value`).innerHTML = `<span class="empty-dash">待填币价</span>`;
                 }
