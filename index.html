@@ -2,179 +2,271 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>质押复利计算器</title>
     <style>
+        /* 高级暗黑主题配色方案 */
         :root {
-            --bg-color: #1a1a1f;
-            --card-bg: #26262d;
-            --text-main: #f0f0f0;
-            --text-muted: #8a8a93;
-            --accent-color: #d12c2c;
-            --input-bg: #32323c;
-            --border-line: #3c3c45;
+            --bg-body: #131317;       /* 最底层深色背景 */
+            --bg-card: #1c1c22;       /* 卡片背景，稍微提亮 */
+            --bg-input: #272730;      /* 输入框背景 */
+            --text-main: #ffffff;     /* 主标题、高亮文字 */
+            --text-muted: #8b8b9b;    /* 标签、辅助文字 */
+            --text-dark: #656575;     /* 分割线、暗色图标 */
+            --accent-red: #e63946;    /* 品牌红 */
+            --accent-red-glow: rgba(230, 57, 70, 0.2);
+            --profit-green: #20c997;  /* 收益绿 */
         }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            padding: 10px;
+
+        * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* 去除安卓点击高亮 */
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Segoe UI, Arial, sans-serif;
+            margin: 0;
+            padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom) 15px; /* 适配全面屏刘海 */
             height: 100vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
-        h2 {
+
+        /* 顶部标题区 */
+        .header {
             text-align: center;
+            padding: 15px 0 20px 0;
+            position: relative;
+        }
+        .header h1 {
+            margin: 0;
             font-size: 18px;
-            margin: 5px 0 15px 0;
-            color: var(--text-main);
+            font-weight: 600;
+            letter-spacing: 1px;
         }
-        .section {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+
+        /* 卡片通用样式 */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }
-        .section-title {
+
+        .card-title {
             font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 10px;
             color: var(--text-muted);
-            border-bottom: 1px solid var(--border-line);
-            padding-bottom: 5px;
+            margin-bottom: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
         }
-        .grid-2 {
+        .card-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 14px;
+            background-color: var(--accent-red);
+            border-radius: 2px;
+            margin-right: 8px;
+        }
+
+        /* 核心参数网格区 */
+        .params-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px 15px;
+            gap: 12px 15px;
         }
+
         .input-group {
             display: flex;
             flex-direction: column;
         }
+
         .input-group label {
             font-size: 12px;
-            margin-bottom: 4px;
             color: var(--text-muted);
+            margin-bottom: 6px;
+            padding-left: 2px;
         }
-        .input-group input {
-            background-color: var(--input-bg);
-            border: 1px solid #454552;
+
+        /* 现代化无边框输入框 */
+        input[type="number"] {
+            background-color: var(--bg-input);
+            border: 1px solid transparent;
             color: var(--text-main);
-            border-radius: 6px;
-            padding: 6px 8px;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 10px 12px;
+            border-radius: 10px;
             outline: none;
-        }
-        .input-group input:focus {
-            border-color: var(--accent-color);
-        }
-        .result-table {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
-        .result-table th, .result-table td {
-            text-align: right;
-            padding: 8px 4px;
-            border-bottom: 1px solid var(--border-line);
-        }
-        .result-table th {
+
+        input[type="number"]::placeholder {
+            color: var(--text-dark);
             font-weight: normal;
-            color: var(--text-muted);
-            font-size: 12px;
         }
-        .result-table th:first-child, .result-table td:first-child {
-            text-align: left;
+
+        input[type="number"]:focus {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px var(--accent-red-glow), inset 0 2px 4px rgba(0,0,0,0.1);
+            background-color: rgba(39, 39, 48, 0.8);
         }
-        .result-table tr:last-child td {
+
+        /* 占据全宽的输入框 */
+        .full-width {
+            grid-column: span 2;
+        }
+
+        /* 预估回报结果列表区 (取代原有的table) */
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .result-row:last-child {
             border-bottom: none;
+            padding-bottom: 0;
         }
-        .time-input {
-            width: 35px;
-            background-color: var(--input-bg);
-            border: 1px solid #454552;
-            color: var(--text-main);
-            border-radius: 4px;
-            padding: 3px;
-            text-align: center;
-            font-size: 13px;
-            outline: none;
-        }
-        .highlight-money {
-            color: #4cd964;
-            font-weight: bold;
+
+        /* 时间标签区 */
+        .time-label {
+            display: flex;
+            align-items: center;
             font-size: 14px;
+            color: var(--text-muted);
+            width: 70px;
         }
-        .result-value {
-            font-weight: bold;
+
+        /* 内嵌微型输入框 */
+        .inline-input {
+            width: 38px !important;
+            height: 26px;
+            padding: 0 !important;
+            text-align: center;
+            font-size: 14px !important;
+            background-color: var(--bg-body) !important;
+            border-radius: 6px !important;
+            margin-right: 6px;
+            color: var(--text-main) !important;
         }
+        .inline-input:focus {
+            box-shadow: inset 0 0 0 1px var(--accent-red) !important;
+        }
+
+        /* 结果数值区 */
+        .result-data {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .result-coin {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .result-fiat {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--profit-green);
+        }
+        
+        /* 占位符样式 */
+        .empty-dash {
+            color: var(--text-dark);
+            font-weight: normal;
+        }
+
     </style>
 </head>
 <body>
-    <h2>质押复利计算器</h2>
-    <div class="section">
-        <div class="section-title">核心参数</div>
-        <div class="grid-2">
+
+    <div class="header">
+        <h1>质押复利计算器</h1>
+    </div>
+
+    <div class="card">
+        <div class="card-title">核心参数</div>
+        <div class="params-grid">
             <div class="input-group">
-                <label>初始币量 (留空不计算)</label>
+                <label>初始币量</label>
                 <input type="number" id="initialAmount" placeholder="如: 1258" step="any">
             </div>
             <div class="input-group">
                 <label>当前币价 ($)</label>
                 <input type="number" id="coinPrice" placeholder="如: 6.084" step="any">
             </div>
+            
             <div class="input-group">
-                <label>年化收益率 APY (%)</label>
+                <label>APY (%)</label>
                 <input type="number" id="apy" value="805.74" step="any">
             </div>
             <div class="input-group">
                 <label>日收益率 (%)</label>
                 <input type="number" id="dailyRate" value="0.6042" step="any">
             </div>
-            <div class="input-group" style="grid-column: span 2;">
-                <label>美元兑换汇率</label>
+
+            <div class="input-group full-width">
+                <label>美元兑换人民币汇率</label>
                 <input type="number" id="exchangeRate" value="7" step="any">
             </div>
         </div>
     </div>
-    <div class="section" style="flex-grow: 1;">
-        <div class="section-title">预估回报 (实时联动)</div>
-        <table class="result-table">
-            <thead>
-                <tr>
-                    <th>预估时长</th>
-                    <th>最终币量</th>
-                    <th>总收益 (¥)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>7 天</td>
-                    <td class="result-value" id="day7Amount">--</td>
-                    <td class="highlight-money" id="day7Value">--</td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="number" id="customMonths" value="1" class="time-input" step="any"> 个月
-                    </td>
-                    <td class="result-value" id="monthAmount">--</td>
-                    <td class="highlight-money" id="monthValue">--</td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="number" id="customYears" value="1" class="time-input" step="any"> 年
-                    </td>
-                    <td class="result-value" id="yearAmount">--</td>
-                    <td class="highlight-money" id="yearValue">--</td>
-                </tr>
-            </tbody>
-        </table>
+
+    <div class="card" style="flex-grow: 1; display: flex; flex-direction: column;">
+        <div class="card-title">预估回报</div>
+        
+        <div class="results-container">
+            <div class="result-row">
+                <div class="time-label">7 天</div>
+                <div class="result-data">
+                    <div class="result-coin" id="day7Amount"><span class="empty-dash">--</span></div>
+                    <div class="result-fiat" id="day7Value"><span class="empty-dash">--</span></div>
+                </div>
+            </div>
+
+            <div class="result-row">
+                <div class="time-label">
+                    <input type="number" id="customMonths" value="1" class="inline-input" step="any"> 个月
+                </div>
+                <div class="result-data">
+                    <div class="result-coin" id="monthAmount"><span class="empty-dash">--</span></div>
+                    <div class="result-fiat" id="monthValue"><span class="empty-dash">--</span></div>
+                </div>
+            </div>
+
+            <div class="result-row">
+                <div class="time-label">
+                    <input type="number" id="customYears" value="1" class="inline-input" step="any"> 年
+                </div>
+                <div class="result-data">
+                    <div class="result-coin" id="yearAmount"><span class="empty-dash">--</span></div>
+                    <div class="result-fiat" id="yearValue"><span class="empty-dash">--</span></div>
+                </div>
+            </div>
+        </div>
     </div>
+
     <script>
         const inputAmount = document.getElementById('initialAmount');
         const inputPrice = document.getElementById('coinPrice');
@@ -183,9 +275,13 @@
         const inputDaily = document.getElementById('dailyRate');
         const inputMonths = document.getElementById('customMonths');
         const inputYears = document.getElementById('customYears');
+
+        // 通用触发计算
         [inputAmount, inputPrice, inputExchange, inputMonths, inputYears].forEach(el => {
             el.addEventListener('input', calculateResults);
         });
+
+        // APY -> 日收益率
         inputApy.addEventListener('input', () => {
             let apy = parseFloat(inputApy.value) / 100;
             if (!isNaN(apy) && apy > -1) {
@@ -194,6 +290,8 @@
             }
             calculateResults();
         });
+
+        // 日收益率 -> APY
         inputDaily.addEventListener('input', () => {
             let daily = parseFloat(inputDaily.value) / 100;
             if (!isNaN(daily)) {
@@ -203,6 +301,16 @@
             }
             calculateResults();
         });
+
+        function formatNumber(num) {
+            // 为数字添加千分位逗号，提升高级感
+            return num.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+        }
+
+        function formatMoney(num) {
+            return '¥ ' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
         function calculateResults() {
             const amount = parseFloat(inputAmount.value);
             const daily = parseFloat(inputDaily.value) / 100;
@@ -210,33 +318,43 @@
             const rate = parseFloat(inputExchange.value);
             const months = parseFloat(inputMonths.value);
             const years = parseFloat(inputYears.value);
+
             if (isNaN(amount) || isNaN(daily)) {
                 resetDisplays();
                 return;
             }
+
             const rebaseRate = daily / 3;
+
             function updateRow(days, prefix) {
                 const totalRebases = days * 3;
                 const finalAmount = amount * Math.pow(1 + rebaseRate, totalRebases);
-                document.getElementById(`${prefix}Amount`).innerText = finalAmount.toFixed(4);
+                
+                document.getElementById(`${prefix}Amount`).innerText = formatNumber(finalAmount);
+
                 if (!isNaN(price) && !isNaN(rate)) {
                     const totalRmb = finalAmount * price * rate;
-                    document.getElementById(`${prefix}Value`).innerText = `¥ ${totalRmb.toFixed(2)}`;
+                    document.getElementById(`${prefix}Value`).innerText = formatMoney(totalRmb);
                 } else {
-                    document.getElementById(`${prefix}Value`).innerText = "等待币价";
+                    document.getElementById(`${prefix}Value`).innerHTML = `<span class="empty-dash">待填币价</span>`;
                 }
             }
+
             updateRow(7, 'day7');
             if(!isNaN(months)) updateRow(months * 30, 'month');
             if(!isNaN(years)) updateRow(years * 365, 'year');
         }
+
         function resetDisplays() {
             const prefixes = ['day7', 'month', 'year'];
+            const emptySpan = `<span class="empty-dash">--</span>`;
             prefixes.forEach(prefix => {
-                document.getElementById(`${prefix}Amount`).innerText = '--';
-                document.getElementById(`${prefix}Value`).innerText = '--';
+                document.getElementById(`${prefix}Amount`).innerHTML = emptySpan;
+                document.getElementById(`${prefix}Value`).innerHTML = emptySpan;
             });
         }
+
+        // 初始化
         calculateResults();
     </script>
 </body>
